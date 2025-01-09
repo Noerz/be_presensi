@@ -1,27 +1,35 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('mata_pelajaran', {
-    idMapel: {
+  return sequelize.define('sekolah', {
+    idSekolah: {
       type: DataTypes.STRING(36),
       allowNull: false,
       primaryKey: true
     },
-    nama: {
-      type: DataTypes.STRING(50),
+    location: {
+      type: DataTypes.STRING(30),
       allowNull: false
     },
-    created_at: {
+    inTime: {
+      type: DataTypes.STRING(30),
+      allowNull: false
+    },
+    outTime: {
+      type: DataTypes.STRING(30),
+      allowNull: false
+    },
+    createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
     },
-    update_at: {
+    updatedAt: {
       type: DataTypes.DATE,
       allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'mata_pelajaran',
+    tableName: 'sekolah',
     timestamps: false,
     indexes: [
       {
@@ -29,7 +37,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "idMapel" },
+          { name: "idSekolah" },
         ]
       },
     ]

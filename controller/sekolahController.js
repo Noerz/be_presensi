@@ -4,12 +4,13 @@ const models = initModels(db);
 // Mengimpor uuid
 const { v4: uuidv4 } = require("uuid");
 
-const getAllKelas = async (req, res) => {
+// READ: Mendapatkan semua data sekolah dengan pagination
+const getAllSekolah = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query; // Default page = 1, limit = 10
     const offset = (page - 1) * limit;
 
-    const { count, rows } = await models.kelas.findAndCountAll({
+    const { count, rows } = await models.sekolah.findAndCountAll({
       offset: parseInt(offset),
       limit: parseInt(limit),
       order: [["createdAt", "DESC"]],
@@ -18,7 +19,7 @@ const getAllKelas = async (req, res) => {
     res.status(200).json({
       code: 200,
       status: "success",
-      message: "Kelas retrieved successfully",
+      message: "Sekolah retrieved successfully",
       data: rows,
       meta: {
         total: count,
@@ -36,30 +37,24 @@ const getAllKelas = async (req, res) => {
   }
 };
 
-const createKelas = async (req, res) => {
+// CREATE: Menambahkan sekolah baru
+const createSekolah = async (req, res) => {
   try {
-    const { nama_kelas, jumlah } = req.body;
+    const { location, inTime, outTime } = req.body;
 
-    if (!nama_kelas || !jumlah) {
+    if (!location || !inTime || !outTime) {
       return res.status(400).json({
         code: 400,
         status: "error",
-        message: "nama_kelas and jumlah are required",
+        message: "Location, inTime, and outTime are required",
       });
     }
 
-    if (nama_kelas.length > 2 || jumlah.length > 2) {
-      return res.status(400).json({
-        code: 400,
-        status: "error",
-        message: "nama_kelas and jumlah must be 2 characters long",
-      });
-    }
-
-    const newKelas = await models.kelas.create({
-      idKelas: uuidv4(),
-      nama_kelas,
-      jumlah,
+    const newSekolah = await models.sekolah.create({
+      idSekolah: uuidv4(),
+      location,
+      inTime,
+      outTime,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -67,8 +62,8 @@ const createKelas = async (req, res) => {
     res.status(201).json({
       code: 201,
       status: "success",
-      message: "Kelas created successfully",
-      data: newKelas,
+      message: "Sekolah created successfully",
+      data: newSekolah,
     });
   } catch (error) {
     res.status(500).json({
@@ -79,56 +74,42 @@ const createKelas = async (req, res) => {
   }
 };
 
-const updateKelas = async (req, res) => {
+// UPDATE: Mengubah sekolah berdasarkan idSekolah
+const updateSekolah = async (req, res) => {
   try {
-    const { idKelas } = req.params;
-    const { nama_kelas, jumlah } = req.body;
+    const { idSekolah } = req.params;
+    const { location, inTime, outTime } = req.body;
 
-    if (!idKelas) {
+    if (!idSekolah) {
       return res.status(400).json({
         code: 400,
         status: "error",
-        message: "idKelas is required",
+        message: "idSekolah is required",
       });
     }
 
-    if (nama_kelas && nama_kelas.length > 2) {
-      return res.status(400).json({
-        code: 400,
-        status: "error",
-        message: "nama_kelas must be 2 characters long",
-      });
-    }
+    const sekolah = await models.sekolah.findByPk(idSekolah);
 
-    if (jumlah && jumlah.length > 2) {
-      return res.status(400).json({
-        code: 400,
-        status: "error",
-        message: "jumlah must be 2 characters long",
-      });
-    }
-
-    const kelas = await models.kelas.findByPk(idKelas);
-
-    if (!kelas) {
+    if (!sekolah) {
       return res.status(404).json({
         code: 404,
         status: "error",
-        message: "Kelas not found",
+        message: "Sekolah not found",
       });
     }
 
-    await kelas.update({
-      nama_kelas,
-      jumlah,
+    await sekolah.update({
+      location,
+      inTime,
+      outTime,
       updatedAt: new Date(),
     });
 
     res.status(200).json({
       code: 200,
       status: "success",
-      message: "Kelas updated successfully",
-      data: kelas,
+      message: "Sekolah updated successfully",
+      data: sekolah,
     });
   } catch (error) {
     res.status(500).json({
@@ -139,34 +120,35 @@ const updateKelas = async (req, res) => {
   }
 };
 
-const deleteKelas = async (req, res) => {
+// DELETE: Menghapus sekolah berdasarkan idSekolah
+const deleteSekolah = async (req, res) => {
   try {
-    const { idKelas } = req.params;
+    const { idSekolah } = req.params;
 
-    if (!idKelas) {
+    if (!idSekolah) {
       return res.status(400).json({
         code: 400,
         status: "error",
-        message: "idKelas is required",
+        message: "idSekolah is required",
       });
     }
 
-    const deletedKelas = await models.kelas.destroy({
-      where: { idKelas },
+    const deletedSekolah = await models.sekolah.destroy({
+      where: { idSekolah },
     });
 
-    if (!deletedKelas) {
+    if (!deletedSekolah) {
       return res.status(404).json({
         code: 404,
         status: "error",
-        message: "Kelas not found",
+        message: "Sekolah not found",
       });
     }
 
     res.status(200).json({
       code: 200,
       status: "success",
-      message: "Kelas deleted successfully",
+      message: "Sekolah deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
@@ -177,25 +159,26 @@ const deleteKelas = async (req, res) => {
   }
 };
 
-const getKelasById = async (req, res) => {
+// READ: Mendapatkan sekolah berdasarkan idSekolah
+const getSekolahById = async (req, res) => {
   try {
-    const { idKelas } = req.params;
+    const { idSekolah } = req.params;
 
-    const kelas = await models.kelas.findByPk(idKelas);
+    const sekolah = await models.sekolah.findByPk(idSekolah);
 
-    if (!kelas) {
+    if (!sekolah) {
       return res.status(404).json({
         code: 404,
         status: "error",
-        message: "Kelas not found",
+        message: "Sekolah not found",
       });
     }
 
     res.status(200).json({
       code: 200,
       status: "success",
-      message: "Kelas retrieved successfully",
-      data: kelas,
+      message: "Sekolah retrieved successfully",
+      data: sekolah,
     });
   } catch (error) {
     res.status(500).json({
@@ -207,9 +190,9 @@ const getKelasById = async (req, res) => {
 };
 
 module.exports = {
-  getAllKelas,
-  createKelas,
-  updateKelas,
-  deleteKelas,
-  getKelasById,
+  getAllSekolah,
+  createSekolah,
+  updateSekolah,
+  deleteSekolah,
+  getSekolahById,
 };

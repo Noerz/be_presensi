@@ -27,15 +27,15 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       references: {
         model: 'mata_pelajaran',
-        key: 'id_mapel'
+        key: 'idMapel'
       }
     },
     guru_id: {
       type: DataTypes.STRING(36),
       allowNull: false,
       references: {
-        model: 'user',
-        key: 'idUser'
+        model: 'staff',
+        key: 'idStaff'
       }
     },
     kelas_id: {

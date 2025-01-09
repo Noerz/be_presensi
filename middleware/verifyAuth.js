@@ -13,10 +13,11 @@ const verifyToken = (req, res, next) => {
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) return res.sendStatus(403);
     req.decoded = decoded;
-    console.log("isi dari token :"+decoded);
+    console.log("isi dari token :" + JSON.stringify(decoded));
     next();
   });
-};
+};  
+
 
 const isAdmin = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -25,11 +26,12 @@ const isAdmin = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    const admin = await models.user.findOne({
+    const user = await models.auth.findOne({
       where: { email: decoded.email },
+      include: [{ model: models.role, as: "role" }]
     });
 
-    if (!admin || admin.role !== "admin") {
+    if (!user || user.role.roleName !== "admin") {
       return res.status(403).json({ msg: "Hanya admin yang dapat mengakses" });
     }
 

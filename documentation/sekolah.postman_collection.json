@@ -1,0 +1,104 @@
+{
+  "info": {
+    "name": "Sekolah API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Sekolah",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/sekolah?page=1&limit=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["sekolah"],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Sekolah",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": JSON.stringify({
+            "location": "Jakarta",
+            "inTime": "07:00",
+            "outTime": "15:00"
+          })
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sekolah",
+          "host": ["{{baseUrl}}"],
+          "path": ["sekolah"]
+        }
+      }
+    },
+    {
+      "name": "Update Sekolah",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": JSON.stringify({
+            "location": "Bandung",
+            "inTime": "08:00",
+            "outTime": "16:00"
+          })
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sekolah/:idSekolah",
+          "host": ["{{baseUrl}}"],
+          "path": ["sekolah", ":idSekolah"]
+        }
+      }
+    },
+    {
+      "name": "Delete Sekolah",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/sekolah/:idSekolah",
+          "host": ["{{baseUrl}}"],
+          "path": ["sekolah", ":idSekolah"]
+        }
+      }
+    },
+    {
+      "name": "Get Sekolah By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/sekolah/:idSekolah",
+          "host": ["{{baseUrl}}"],
+          "path": ["sekolah", ":idSekolah"]
+        }
+      }
+    }
+  ]
+}

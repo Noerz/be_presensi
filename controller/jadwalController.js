@@ -14,7 +14,7 @@ const getAllJadwal = async (req, res) => {
       order: [["createdAt", "DESC"]],
       include: [
         { model: models.mata_pelajaran, as: "mapel" }, // Include mata_pelajaran details
-        { model: models.user, as: "guru" }, // Include user (guru) details
+        { model: models.staff, as: "guru" }, // Include staff (guru) details
         { model: models.kelas, as: "kelas" }, // Include kelas details
       ],
     });
@@ -174,7 +174,7 @@ const getJadwalById = async (req, res) => {
     const jadwal = await models.jadwal.findByPk(idJadwal, {
       include: [
         { model: models.mata_pelajaran, as: "mapel" },
-        { model: models.user, as: "guru" },
+        { model: models.staff, as: "guru" },
         { model: models.kelas, as: "kelas" },
       ],
     });

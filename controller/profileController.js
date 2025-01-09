@@ -9,14 +9,24 @@ require("dotenv").config();
 // Mendapatkan data profil
 const getProfile = async (req, res) => {
   try {
-    const { idUser } = req.decoded;
+    const { idMurid: siswa_id,idStaff:staff_id, roleCode } = req.decoded;
+    let response;
 
-    const response = await models.user.findOne({
-      where: { idUser },
-      include: [
-        { model: models.auth, as: "auth", attributes: ["email", "nisn"] },
-      ],
-    });
+    if (roleCode === 2) {
+      response = await models.staff.findOne({
+        where: { idStaff: staff_id },
+        include: [
+          { model: models.auth, as: "auth", attributes: ["email"] },
+        ],
+      });
+    } else if (roleCode === 1) {
+      response = await models.murid.findOne({
+        where: { idMurid: siswa_id },
+        include: [
+          { model: models.auth, as: "auth", attributes: ["nisn"] },
+        ],
+      });
+    }
 
     if (!response) {
       return res.status(404).json({
@@ -104,14 +114,19 @@ const changePassword = async (req, res) => {
 // Memperbarui foto profil
 const updateProfilePicture = async (req, res) => {
   try {
-    const { idUser } = req.decoded;
+    const { idMurid: siswa_id, idStaff: staff_id, roleCode } = req.decoded;
     const { file } = req;
 
     if (!file) {
       return res.status(400).json({ msg: "Tidak ada file yang diunggah" });
     }
 
-    const user = await models.user.findOne({ where: { idUser } });
+    let user;
+    if (roleCode === 2) {
+      user = await models.staff.findOne({ where: { idStaff: staff_id } });
+    } else if (roleCode === 1) {
+      user = await models.murid.findOne({ where: { idMurid: siswa_id } });
+    }
 
     if (!user) {
       return res.status(404).json({ msg: "User tidak ditemukan" });
@@ -126,10 +141,17 @@ const updateProfilePicture = async (req, res) => {
     }
 
     // Menyimpan file baru
-    await models.user.update(
-      { image: file.filename, updatedAt: new Date() },
-      { where: { idUser } }
-    );
+    if (roleCode === 2) {
+      await models.staff.update(
+        { image: file.filename, updatedAt: new Date() },
+        { where: { idStaff: staff_id } }
+      );
+    } else if (roleCode === 1) {
+      await models.murid.update(
+        { image: file.filename, updatedAt: new Date() },
+        { where: { idMurid: siswa_id } }
+      );
+    }
 
     res.status(200).json({ msg: "Foto profil berhasil diperbarui" });
   } catch (error) {
@@ -141,9 +163,15 @@ const updateProfilePicture = async (req, res) => {
 // Mendapatkan foto profil
 const getProfilePicture = async (req, res) => {
   try {
-    const { idUser } = req.decoded;
+    const { idMurid: siswa_id, idStaff: staff_id, roleCode } = req.decoded;
+    let user;
 
-    const user = await models.user.findOne({ where: { idUser } });
+    if (roleCode === 2) {
+      user = await models.staff.findOne({ where: { idStaff: staff_id } });
+    } else if (roleCode === 1) {
+      user = await models.murid.findOne({ where: { idMurid: siswa_id } });
+    }
+
     if (!user || !user.image) {
       return res.status(404).json({ msg: "Foto profil tidak ditemukan" });
     }
@@ -153,6 +181,7 @@ const getProfilePicture = async (req, res) => {
       return res.status(404).json({ msg: "File tidak ditemukan" });
     }
 
+    res.setHeader('Content-Type', 'image/jpeg');
     res.sendFile(filePath);
   } catch (error) {
     console.error("Error in getProfilePicture:", error);

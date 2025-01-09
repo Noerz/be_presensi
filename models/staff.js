@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('user', {
-    idUser: {
+  return sequelize.define('staff', {
+    idStaff: {
       type: DataTypes.STRING(36),
       allowNull: false,
       primaryKey: true
@@ -10,20 +10,24 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(50),
       allowNull: false
     },
-    noHp: {
-      type: DataTypes.STRING(15),
+    nip: {
+      type: DataTypes.STRING(18),
       allowNull: true
     },
-    alamat: {
-      type: DataTypes.TEXT,
+    noHp: {
+      type: DataTypes.STRING(15),
       allowNull: true
     },
     image: {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    kelas: {
-      type: DataTypes.STRING(50),
+    gender: {
+      type: DataTypes.STRING(6),
+      allowNull: true
+    },
+    alamat: {
+      type: DataTypes.TEXT,
       allowNull: true
     },
     auth_id: {
@@ -35,9 +39,8 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     status: {
-      type: DataTypes.ENUM('0','1'),
-      allowNull: true,
-      defaultValue: "1"
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -50,7 +53,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'user',
+    tableName: 'staff',
     timestamps: false,
     indexes: [
       {
@@ -58,7 +61,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "idUser" },
+          { name: "idStaff" },
         ]
       },
       {

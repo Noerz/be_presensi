@@ -1,101 +1,43 @@
-const authHelpers = require("../helpers/authHelper");
-const AuthServices = require("../services/authServices");
+const AuthService = require("../services/authService");
+const UserService = require("../services/userService");
+const MailService = require("../services/mailService");
 
 const Register = async (req, res) => {
+  const { nama, email, nisn, password, roleCode } = req.body;
+
   try {
-    const { nama, email, nisn, password, roleCode } = req.body;
-
-    if (!(await AuthServices.validateRole(roleCode)))
-      return res.status(400).json({ msg: "Invalid role code" });
-
-    if ((roleCode === 2 && (!email || nisn)) || (roleCode === 1 && (!nisn || email)))
-      return res.status(400).json({ msg: `Invalid input for roleCode ${roleCode}` });
-
-    if (await AuthServices.findAuthByEmailOrNisn(email, nisn))
-      return res.status(400).json({ msg: "User already exists" });
-
-    const hashedPassword = await authHelpers.hashPassword(password);
-    const newAuth = await AuthServices.createAuthEntry({
-      idAuth: authHelpers.uuidv4(),
-      email: roleCode === 2 ? email : null,
-      nisn: roleCode === 1 ? nisn : null,
-      password: hashedPassword,
-      role_id: roleCode,
-    });
-
-    const newUser = await AuthServices.createUserEntry({
-      idUser: authHelpers.uuidv4(),
-      nama,
-      auth_id: newAuth.idAuth,
-    });
-
-    res.status(201).json({
-      code: 201,
-      status: "success",
-      message: "User registered successfully",
-      data: newUser,
-    });
+    const result = await AuthService.registerUser({ nama, email, nisn, password, roleCode });
+    res.status(result.status).json(result.response);
   } catch (error) {
-    res.status(500).json({ code: 500, status: "error", message: error.message, data: null });
+    console.error("Registration Error:", error);
+    res.status(500).json({ msg: error.message });
   }
 };
 
-const Login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { email, nisn, password } = req.body;
-
-    if (!email && !nisn)
-      return res.status(400).json({ msg: "Email or NISN is required" });
-
-    const auth = await AuthServices.findAuthByEmailOrNisn(email, nisn);
-    if (!auth || !(await authHelpers.comparePassword(password, auth.password)))
-      return res.status(401).json({ msg: "Invalid credentials" });
-
-    const user = await AuthServices.findUserByAuthId(auth.idAuth);
-    if (!user) return res.status(404).json({ msg: "User not found" });
-
-    const token = authHelpers.generateAccessToken(
-      { idUser: user.idUser, roleCode: auth.role_id },
-      process.env.ACCESS_TOKEN_SECRET,
-      "1h"
-    );
-
-    res.status(200).json({
-      code: 200,
-      status: "success",
-      message: "Login successful",
-      data: {
-        idUser: user.idUser,
-        email: auth.email,
-        nisn: auth.nisn,
-        roleCode: auth.role_id,
-        accessToken: token,
-      },
-    });
+    const result = await AuthService.loginUser({ email, nisn, password });
+    res.status(result.status).json(result.response);
   } catch (error) {
-    res.status(500).json({ code: 500, status: "error", message: error.message, data: null });
+    console.error("Login Error:", error);
+    res.status(500).json({
+      code: 500,
+      status: "error",
+      message: error.message,
+      data: null,
+    });
   }
 };
 
-const ResetPassword = async (req, res) => {
+const resetPassword = async (req, res) => {
   try {
     const { email } = req.body;
-
-    if (!email)
-      return res.status(400).json({ msg: "Email is required" });
-
-    const newPassword = authHelpers.generateRandomPassword();
-    await AuthServices.updateUserPassword(email, await authHelpers.hashPassword(newPassword));
-    await authHelpers.sendEmail({
-      to: email,
-      subject: "Reset Password",
-      text: `Your new password: ${newPassword}`,
-    });
-
-    res.status(200).json({ code: 200, status: "success", message: "Password reset successful" });
+    const result = await AuthService.resetPassword(email);
+    res.status(result.status).json(result.response);
   } catch (error) {
-    res.status(500).json({ code: 500, status: "error", message: error.message, data: null });
+    res.status(500).json({ msg: error.message });
   }
 };
 
-module.exports = { Register, Login, ResetPassword };
+module.exports = { Register, login, resetPassword };

@@ -7,7 +7,7 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true
     },
     inLocation: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING(25),
       allowNull: false
     },
     inTime: {
@@ -23,7 +23,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     outLocation: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING(25),
       allowNull: true
     },
     outTime: {
@@ -40,18 +40,34 @@ module.exports = function(sequelize, DataTypes) {
     },
     siswa_id: {
       type: DataTypes.STRING(36),
-      allowNull: false,
+      allowNull: true,
       references: {
-        model: 'user',
-        key: 'idUser'
+        model: 'murid',
+        key: 'idMurid'
+      }
+    },
+    staff_id: {
+      type: DataTypes.STRING(36),
+      allowNull: true,
+      references: {
+        model: 'staff',
+        key: 'idStaff'
       }
     },
     jadwal_id: {
       type: DataTypes.STRING(36),
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'jadwal',
         key: 'idJadwal'
+      }
+    },
+    school_id: {
+      type: DataTypes.STRING(36),
+      allowNull: true,
+      references: {
+        model: 'sekolah',
+        key: 'idSekolah'
       }
     },
     createdAt: {
@@ -81,6 +97,20 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "siswa_id" },
+        ]
+      },
+      {
+        name: "staff_id",
+        using: "BTREE",
+        fields: [
+          { name: "staff_id" },
+        ]
+      },
+      {
+        name: "school_id",
+        using: "BTREE",
+        fields: [
+          { name: "school_id" },
         ]
       },
       {

@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet({ xPoweredBy: false }));
 app.use(express.static("public")); // Menyajikan folder public
-app.use('/api/v1/uploads', express.static('uploads')); // Menyajikan folder uploads secara statis
+app.use('/uploads', express.static('uploads')); // Menyajikan folder uploads secara statis
 
 app.get("/", (req, res) => {
   res.send(`

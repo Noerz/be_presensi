@@ -1,5 +1,5 @@
 // const express = require('express');
-const { Register, login, resetPassword } = require('../controller/authController');
+const authController = require("../controller/auth/authController");
 const { isAdmin, isUser,verifyToken } = require('../middleware/verifyAuth');
 
 
@@ -8,8 +8,8 @@ const { isAdmin, isUser,verifyToken } = require('../middleware/verifyAuth');
 // router.get('/users', getUsers);
 
 const authRoutes = (router) => {
-    router.post('/register', Register);
-    router.post('/login', login);
+    router.post('/register', authController.Register);
+    router.post('/login', authController.login);
     // router.patch('/reset',resetPassword);
     // router.get('/profile', verifyToken, getProfile);
     // router.patch('/profile',verifyToken,updateProfile)

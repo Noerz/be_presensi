@@ -7,7 +7,7 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true
     },
     inLocation: {
-      type: DataTypes.STRING(25),
+      type: DataTypes.STRING(20),
       allowNull: false
     },
     inTime: {
@@ -23,7 +23,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     outLocation: {
-      type: DataTypes.STRING(25),
+      type: DataTypes.STRING(20),
       allowNull: true
     },
     outTime: {
@@ -38,33 +38,25 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(30),
       allowNull: true
     },
-    siswa_id: {
-      type: DataTypes.STRING(36),
-      allowNull: true,
-      references: {
-        model: 'murid',
-        key: 'idMurid'
-      }
-    },
     staff_id: {
       type: DataTypes.STRING(36),
-      allowNull: true,
+      allowNull: false,
       references: {
-        model: 'staff',
-        key: 'idStaff'
+        model: 'user',
+        key: 'idUser'
       }
     },
     jadwal_id: {
       type: DataTypes.STRING(36),
-      allowNull: true,
+      allowNull: false,
       references: {
         model: 'jadwal',
         key: 'idJadwal'
       }
     },
-    school_id: {
+    sekolah_id: {
       type: DataTypes.STRING(36),
-      allowNull: true,
+      allowNull: false,
       references: {
         model: 'sekolah',
         key: 'idSekolah'
@@ -73,11 +65,12 @@ module.exports = function(sequelize, DataTypes) {
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+      defaultValue: Sequelize.Sequelize.fn('current_timestamp')
     },
     updatedAt: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.fn('current_timestamp')
     }
   }, {
     sequelize,
@@ -93,13 +86,6 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "siswa_id",
-        using: "BTREE",
-        fields: [
-          { name: "siswa_id" },
-        ]
-      },
-      {
         name: "staff_id",
         using: "BTREE",
         fields: [
@@ -107,17 +93,17 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "school_id",
-        using: "BTREE",
-        fields: [
-          { name: "school_id" },
-        ]
-      },
-      {
         name: "jadwal_id",
         using: "BTREE",
         fields: [
           { name: "jadwal_id" },
+        ]
+      },
+      {
+        name: "sekolah_id",
+        using: "BTREE",
+        fields: [
+          { name: "sekolah_id" },
         ]
       },
     ]

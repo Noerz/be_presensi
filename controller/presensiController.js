@@ -199,9 +199,9 @@ console.log("isi dari jadwal "+jadwal);
 
 const getPresensiByUser = async (req, res) => {
   try {
-    const { idMurid: siswa_id,idStaff:staff_id } = req.decoded;
+    const { idMurid: siswa_id, idStaff: staff_id } = req.decoded;
 
-    if (!siswa_id&&!staff_id) {
+    if (!siswa_id && !staff_id) {
       return res.status(400).json({
         code: 400,
         status: "error",
@@ -212,9 +212,11 @@ const getPresensiByUser = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
 
+    const whereClause = siswa_id ? { siswa_id } : { staff_id };
+
     const { rows: presensiList, count: totalItems } =
       await models.presensi.findAndCountAll({
-        where: { siswa_id },
+        where: whereClause,
         include: [
           {
             model: models.jadwal,
@@ -284,7 +286,7 @@ const createPresensiStaff = async (req, res) => {
       });
     }
 
-    const now = moment();
+    const now = moment().utcOffset(7);
     const todayStart = now.clone().startOf('day');
     const todayEnd = now.clone().endOf('day');
 

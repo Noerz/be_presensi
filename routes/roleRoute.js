@@ -1,21 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const {
-  createRole,
-  getRole,
-  updateRole,
-  deleteRole,
-} = require("../controller/roleController");
-const { verifyToken } = require("../middleware/verifyAuth");
+const roleController = require("../controller/role/roleController");
+const { verifyToken,isAdmin } = require("../middleware/verifyAuth");
 
 const roleRoutes = (router) => {
-  router.post("/role", createRole);
-  router.get("/role", getRole);
-  router.put("/role/:idRole", updateRole);
-  //   router.get("/kode", getCode);
-  //   router.get("/dompet/user", verifyToken, getDompetByIdUser);
-
-  router.delete("/role", deleteRole);
+  router.post("/role", verifyToken, isAdmin, roleController.createRole);
+  router.get("/role", verifyToken, roleController.getRole);
+  router.put("/role/:idRole", verifyToken, isAdmin, roleController.updateRole);
+  router.delete("/role", verifyToken, isAdmin, roleController.deleteRole);
 };
 
 module.exports = { roleRoutes };

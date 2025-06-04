@@ -7,25 +7,26 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true
     },
     location: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(55),
       allowNull: false
     },
     inTime: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(55),
       allowNull: false
     },
     outTime: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(55),
       allowNull: false
     },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+      defaultValue: Sequelize.Sequelize.fn('current_timestamp')
     },
     updatedAt: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      defaultValue: "0000-00-00 00:00:00"
     }
   }, {
     sequelize,

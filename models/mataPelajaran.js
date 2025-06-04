@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('mata_pelajaran', {
-    idMapel: {
+    id_mapel: {
       type: DataTypes.STRING(36),
       allowNull: false,
       primaryKey: true
@@ -13,11 +13,12 @@ module.exports = function(sequelize, DataTypes) {
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+      defaultValue: Sequelize.Sequelize.fn('current_timestamp')
     },
     update_at: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      defaultValue: "0000-00-00 00:00:00"
     }
   }, {
     sequelize,
@@ -29,7 +30,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "idMapel" },
+          { name: "id_mapel" },
         ]
       },
     ]

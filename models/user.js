@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('staff', {
-    idStaff: {
+  return sequelize.define('user', {
+    idUser: {
       type: DataTypes.STRING(36),
       allowNull: false,
       primaryKey: true
@@ -10,24 +10,20 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(50),
       allowNull: false
     },
-    nip: {
-      type: DataTypes.STRING(18),
-      allowNull: true
-    },
     noHp: {
       type: DataTypes.STRING(15),
+      allowNull: true
+    },
+    alamat: {
+      type: DataTypes.TEXT,
       allowNull: true
     },
     image: {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    gender: {
-      type: DataTypes.STRING(6),
-      allowNull: true
-    },
-    alamat: {
-      type: DataTypes.TEXT,
+    jabatan: {
+      type: DataTypes.STRING(50),
       allowNull: true
     },
     auth_id: {
@@ -39,21 +35,23 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     status: {
-      type: DataTypes.INTEGER,
-      allowNull: false
+      type: DataTypes.CHAR(2),
+      allowNull: true,
+      defaultValue: "1"
     },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+      defaultValue: Sequelize.Sequelize.fn('current_timestamp')
     },
     updatedAt: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.fn('current_timestamp')
     }
   }, {
     sequelize,
-    tableName: 'staff',
+    tableName: 'user',
     timestamps: false,
     indexes: [
       {
@@ -61,7 +59,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "idStaff" },
+          { name: "idUser" },
         ]
       },
       {

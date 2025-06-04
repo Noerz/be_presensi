@@ -1,12 +1,10 @@
-const AuthService = require("../services/authService");
-const UserService = require("../services/userService");
-const MailService = require("../services/mailService");
+const AuthService = require("../../services/auth/authService");
 
 const Register = async (req, res) => {
-  const { nama, email, nisn, password, roleCode } = req.body;
+  const { nama, email, password, roleCode } = req.body;
 
   try {
-    const result = await AuthService.registerUser({ nama, email, nisn, password, roleCode });
+    const result = await AuthService.registerUser({ nama, email, password, roleCode });
     res.status(result.status).json(result.response);
   } catch (error) {
     console.error("Registration Error:", error);
@@ -16,17 +14,12 @@ const Register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, nisn, password } = req.body;
-    const result = await AuthService.loginUser({ email, nisn, password });
+    const { email, password } = req.body;
+    const result = await AuthService.loginUser({ email, password });
     res.status(result.status).json(result.response);
   } catch (error) {
     console.error("Login Error:", error);
-    res.status(500).json({
-      code: 500,
-      status: "error",
-      message: error.message,
-      data: null,
-    });
+    res.status(500).json({ msg: error.message });
   }
 };
 

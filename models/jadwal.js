@@ -27,15 +27,15 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       references: {
         model: 'mata_pelajaran',
-        key: 'idMapel'
+        key: 'id_mapel'
       }
     },
     guru_id: {
       type: DataTypes.STRING(36),
       allowNull: false,
       references: {
-        model: 'staff',
-        key: 'idStaff'
+        model: 'user',
+        key: 'idUser'
       }
     },
     kelas_id: {
@@ -49,11 +49,12 @@ module.exports = function(sequelize, DataTypes) {
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+      defaultValue: Sequelize.Sequelize.fn('current_timestamp')
     },
     updatedAt: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.fn('current_timestamp')
     }
   }, {
     sequelize,

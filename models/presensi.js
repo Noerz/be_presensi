@@ -46,14 +46,6 @@ module.exports = function(sequelize, DataTypes) {
         key: 'idUser'
       }
     },
-    jadwal_id: {
-      type: DataTypes.STRING(36),
-      allowNull: false,
-      references: {
-        model: 'jadwal',
-        key: 'idJadwal'
-      }
-    },
     sekolah_id: {
       type: DataTypes.STRING(36),
       allowNull: false,
@@ -90,13 +82,6 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "staff_id" },
-        ]
-      },
-      {
-        name: "jadwal_id",
-        using: "BTREE",
-        fields: [
-          { name: "jadwal_id" },
         ]
       },
       {

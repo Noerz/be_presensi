@@ -10,6 +10,14 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(50),
       allowNull: false
     },
+    nip: {
+      type: DataTypes.STRING(15),
+      allowNull: true
+    },
+    gender: {
+      type: DataTypes.STRING(10),
+      allowNull: true
+    },
     noHp: {
       type: DataTypes.STRING(15),
       allowNull: true

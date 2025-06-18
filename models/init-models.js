@@ -20,8 +20,6 @@ function initModels(sequelize) {
 
   user.belongsTo(auth, { as: "auth", foreignKey: "auth_id"});
   auth.hasMany(user, { as: "users", foreignKey: "auth_id"});
-  presensi.belongsTo(jadwal, { as: "jadwal", foreignKey: "jadwal_id"});
-  jadwal.hasMany(presensi, { as: "presensis", foreignKey: "jadwal_id"});
   jadwal.belongsTo(kela, { as: "kela", foreignKey: "kelas_id"});
   kela.hasMany(jadwal, { as: "jadwals", foreignKey: "kelas_id"});
   jadwal.belongsTo(mata_pelajaran, { as: "mapel", foreignKey: "mapel_id"});

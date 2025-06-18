@@ -1,19 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const {
-  getAllJadwal,
-  createJadwal,
-  updateJadwal,
-  deleteJadwal,
-  getJadwalById,
-} = require("../controller/jadwalController");
+  getAllJadwalController,
+  createJadwalController,
+  getJadwalByIdController,
+  updateJadwalController,
+  deleteJadwalController,
+} = require("../controller/jadwal/jadwalController");
 
 const jadwalRoutes = (router) => {
-  router.get("/jadwal", getAllJadwal); // Retrieve all jadwal with pagination
-  router.get("/jadwal/:idJadwal", getJadwalById); // Retrieve jadwal by ID
-  router.post("/jadwal", createJadwal); // Create new jadwal
-  router.put("/jadwal/:idJadwal", updateJadwal); // Update jadwal by ID
-  router.delete("/jadwal/:idJadwal", deleteJadwal); // Delete jadwal by ID
+  router.get("/jadwal", getAllJadwalController);
+  router.post("/jadwal", createJadwalController);
+  router.get("/jadwal/:idJadwal", getJadwalByIdController);
+  router.put("/jadwal/:idJadwal", updateJadwalController);
+  router.delete("/jadwal/:idJadwal", deleteJadwalController);
 };
 
 module.exports = { jadwalRoutes };

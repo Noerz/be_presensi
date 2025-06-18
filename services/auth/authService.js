@@ -111,6 +111,7 @@ class AuthService {
         // email: auth.email,
         // roleCode: auth.role.code,
         accessToken,
+        roleCode: auth.role.code, // tambahkan roleCode di sini
       };
 
       return {

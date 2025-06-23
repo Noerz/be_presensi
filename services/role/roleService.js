@@ -29,6 +29,33 @@ const createRole = async (nama, code) => {
   });
 };
 
+const createMultipleRoles = async (roles) => {
+  const createdRoles = [];
+
+  for (const role of roles) {
+    const { nama, code } = role;
+
+    const existingRole = await Role.findOne({
+      where: {
+        [require("sequelize").Op.or]: [{ nama }, { code }],
+      },
+    });
+
+    if (!existingRole) {
+      const newRole = await Role.create({
+        idRole: uuidv4(),
+        nama,
+        code,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      createdRoles.push(newRole);
+    }
+  }
+
+  return createdRoles;
+};
+
 const updateRole = async (idRole, nama, code) => {
   const role = await Role.findOne({ where: { idRole } });
   if (!role) throw new Error("Role not found");
@@ -49,6 +76,8 @@ const deleteRole = async (idRole) => {
 module.exports = {
   getRoles,
   createRole,
+  createMultipleRoles,
   updateRole,
   deleteRole,
+  
 };

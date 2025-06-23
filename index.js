@@ -3,6 +3,7 @@ const cors = require("cors");
 const routes = require("./routes");
 const helmet = require("helmet");
 require("dotenv").config();
+const db = require("./config/database"); // tambahkan ini untuk akses db instance
 const app = express();
 
 app.use(cors());
@@ -11,6 +12,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet({ xPoweredBy: false }));
 app.use(express.static("public")); // Menyajikan folder public
 app.use('/uploads', express.static('uploads')); // Menyajikan folder uploads secara statis
+
+// Middleware untuk cek koneksi database
+app.use(async (req, res, next) => {
+  try {
+    await db.authenticate();
+    next();
+  } catch (err) {
+    res.status(500).json({ error: "Database tidak terhubung" });
+  }
+});
 
 app.get("/", (req, res) => {
   res.send(`

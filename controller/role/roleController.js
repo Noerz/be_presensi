@@ -3,7 +3,8 @@ const {
   createRole,
   updateRole,
   deleteRole,
-} = require("../../services/role/roleService")
+  createMultipleRoles,
+} = require("../../services/role/roleService");
 
 // Get All Roles
 const getRole = async (req, res) => {
@@ -48,11 +49,42 @@ const createRoleController = async (req, res) => {
       data: newRole,
     });
   } catch (error) {
-    return res.status(error.message.includes("already exists") ? 409 : 500).json({
+    return res
+      .status(error.message.includes("already exists") ? 409 : 500)
+      .json({
+        code: 500,
+        status: "error",
+        message: error.message,
+        data: null,
+      });
+  }
+};
+
+const createMultipleRolesController = async (req, res) => {
+  try {
+    const roles = req.body; // expecting array of { nama, code }
+
+    if (!Array.isArray(roles) || roles.length === 0) {
+      return res.status(400).json({
+        code: 400,
+        status: "error",
+        message: "Request body must be a non-empty array of roles",
+      });
+    }
+
+    const result = await createMultipleRoles(roles);
+
+    return res.status(201).json({
+      code: 201,
+      status: "success",
+      message: "Roles created successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
       code: 500,
       status: "error",
       message: error.message,
-      data: null,
     });
   }
 };
@@ -126,6 +158,7 @@ const deleteRoleController = async (req, res) => {
 module.exports = {
   getRole,
   createRole: createRoleController,
+  createMultipleRoles: createMultipleRolesController,
   updateRole: updateRoleController,
   deleteRole: deleteRoleController,
 };

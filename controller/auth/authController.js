@@ -4,7 +4,12 @@ const Register = async (req, res) => {
   const { nama, email, password, roleCode } = req.body;
 
   try {
-    const result = await AuthService.registerUser({ nama, email, password, roleCode });
+    const result = await AuthService.registerUser({
+      nama,
+      email,
+      password,
+      roleCode,
+    });
     res.status(result.status).json(result.response);
   } catch (error) {
     console.error("Registration Error:", error);
@@ -15,11 +20,25 @@ const Register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        code: 400,
+        status: "error",
+        message: "Email and password are required",
+      });
+    }
+
     const result = await AuthService.loginUser({ email, password });
-    res.status(result.status).json(result.response);
+
+    return res.status(result.status).json(result.response);
   } catch (error) {
     console.error("Login Error:", error);
-    res.status(500).json({ msg: error.message });
+    return res.status(500).json({
+      code: 500,
+      status: "error",
+      message: "Internal server error",
+    });
   }
 };
 

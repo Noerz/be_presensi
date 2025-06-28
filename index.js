@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet({ xPoweredBy: false }));
 app.use(express.static("public")); // Menyajikan folder public
-app.use('/uploads', express.static('uploads')); // Menyajikan folder uploads secara statis
+app.use("/uploads", express.static("uploads")); // Menyajikan folder uploads secara statis
 
 // Middleware untuk cek koneksi database
 app.use(async (req, res, next) => {
@@ -87,6 +87,31 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1", routes);
+
+// Setelah semua route
+app.use((err, req, res, next) => {
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({
+      code: 400,
+      status: "error",
+      message: "File terlalu besar. Maksimum ukuran adalah 5 MB.",
+    });
+  }
+
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({
+      code: 400,
+      status: "error",
+      message: err.message,
+    });
+  }
+
+  return res.status(500).json({
+    code: 500,
+    status: "error",
+    message: err.message || "Internal server error",
+  });
+});
 
 app.listen(process.env.PORT, () =>
   console.log("server berjalan pada port " + process.env.PORT)

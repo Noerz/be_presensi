@@ -4,6 +4,7 @@ const db = require("../config/database");
 const initModels = require("../models/init-models");
 const models = initModels(db);
 const moment = require("moment");
+const ExcelJS = require("exceljs");
 
 // CREATE: Presensi masuk untuk staff
 const createPresensiStaff = async (req, res) => {
@@ -231,8 +232,116 @@ const getPresensiByUser = async (req, res) => {
   }
 };
 
+// GET: Rekap presensi staff berdasarkan bulan dan user
+const getRekapPresensiByBulanDanUser = async (req, res) => {
+  try {
+    const { bulan, tahun, userId } = req.query;
+
+    if (!bulan || !tahun || !userId) {
+      return res.status(400).json({
+        code: 400,
+        status: "error",
+        message: "Parameter bulan, tahun, dan userId wajib diisi",
+      });
+    }
+
+    const startDate = moment(`${tahun}-${bulan}-01`).startOf("month").toDate();
+    const endDate = moment(`${tahun}-${bulan}-01`).endOf("month").toDate();
+
+    const presensiList = await models.presensi.findAll({
+      where: {
+        staff_id: userId,
+        createdAt: {
+          [db.Sequelize.Op.between]: [startDate, endDate],
+        },
+      },
+      attributes: [
+        "idPresensi",
+        "inTime",
+        "inKeterangan",
+        "outTime",
+        "outKeterangan",
+        "createdAt",
+      ],
+      order: [["createdAt", "ASC"]],
+    });
+
+    res.status(200).json({
+      code: 200,
+      status: "success",
+      message: "Rekap presensi berhasil diambil",
+      data: presensiList,
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: 500,
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+// GET: Export semua presensi ke Excel
+const exportRekapPresensiToExcel = async (req, res) => {
+  try {
+    const presensiData = await models.presensi.findAll({
+      include: [
+        {
+          model: models.user,
+          as: "staff",
+          attributes: ["nama"],
+        },
+      ],
+      order: [["createdAt", "ASC"]],
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Rekap Presensi");
+
+    worksheet.columns = [
+      { header: "Nama", key: "nama", width: 25 },
+      { header: "Tanggal", key: "tanggal", width: 20 },
+      { header: "Jam Masuk", key: "inTime", width: 20 },
+      { header: "Keterangan Masuk", key: "inKeterangan", width: 30 },
+      { header: "Jam Keluar", key: "outTime", width: 20 },
+      { header: "Keterangan Keluar", key: "outKeterangan", width: 30 },
+    ];
+
+    presensiData.forEach((item) => {
+      worksheet.addRow({
+        nama: item.staff?.nama || "-",
+        tanggal: moment(item.createdAt).format("YYYY-MM-DD"),
+        inTime: item.inTime,
+        inKeterangan: item.inKeterangan,
+        outTime: item.outTime || "-",
+        outKeterangan: item.outKeterangan || "-",
+      });
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=rekap_presensi.xlsx"
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error("Export Excel Error:", error.message);
+    res.status(500).json({
+      code: 500,
+      status: "error",
+      message: error.message,
+    });
+  }
+};
 module.exports = {
   createPresensiStaff,
   updatePresensiOutStaff,
   getPresensiByUser,
+  getRekapPresensiByBulanDanUser,
+  exportRekapPresensiToExcel,
 };

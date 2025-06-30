@@ -68,7 +68,7 @@ const changePassword = async (req, res) => {
 const updateProfilePicture = async (req, res) => {
   try {
     const { decoded } = req;
-
+    console.log(req.file);
     if (!req.file) {
       return res.status(400).json({
         code: 400,

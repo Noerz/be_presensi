@@ -9,8 +9,10 @@ const { presensiRoutes } = require("./presensiRoute");
 const { sekolahRoutes } = require("./sekolahRoute");
 // const { transaksiRoutes } = require("./transaksiRoute");
 const { profileRoutes } = require("./profileRoute");
+const infoRoutes = require("./infoRoute");
 
 const router = express.Router();
+router.use(infoRoutes);
 authRoutes(router);
 roleRoutes(router);
 kelasRoutes(router);

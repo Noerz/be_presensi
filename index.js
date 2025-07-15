@@ -25,65 +25,94 @@ app.use(async (req, res, next) => {
 
 app.get("/", (req, res) => {
   res.send(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Hello World</title>
-            <style>
-                body {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    margin: 0;
-                    font-family: Arial, sans-serif;
-                    background: linear-gradient(135deg, #1fa2ff, #12d8fa, #a6ffcb);
-                    color: #fff;
-                }
-                .container {
-                    text-align: center;
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Welcome | Express API</title>
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
+                color: #fff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                padding: 20px;
+            }
+            .card {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 16px;
+                padding: 40px;
+                text-align: center;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+                max-width: 400px;
+                width: 100%;
+            }
+            h1 {
+                font-size: 32px;
+                margin-bottom: 10px;
+                letter-spacing: 1px;
+            }
+            p {
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            a.button {
+                padding: 12px;
+                border: none;
+                border-radius: 6px;
+                text-decoration: none;
+                color: #fff;
+                font-weight: 500;
+                background: #007bff;
+                transition: background 0.3s ease;
+            }
+            a.button:hover {
+                background: #0056b3;
+            }
+            .info {
+                margin-top: 30px;
+                font-size: 13px;
+                opacity: 0.7;
+            }
+            @media (max-width: 500px) {
+                .card {
                     padding: 20px;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    border-radius: 10px;
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
                 }
                 h1 {
-                    font-size: 48px;
-                    margin: 0;
-                    text-transform: uppercase;
+                    font-size: 24px;
                 }
-                p {
-                    font-size: 18px;
-                    margin: 10px 0 0;
-                }
-                .button {
-                    margin-top: 100px;
-                    padding: 10px 20px;
-                    font-size: 16px;
-                    color: #fff;
-                    background-color: #007BFF;
-                    border: none;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    text-decoration: none;
-                    transition: background-color 0.3s ease;
-                }
-                .button:hover {
-                    background-color: #0056b3;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>Hello World</h1>
-                <p>Welcome to my Express.js app!</p>
-                <a href="https://github.com" target="_blank" class="button">Visit My GitHub</a>
+            }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h1>🚀 Express API</h1>
+            <p>Welcome to the backend server.<br>Everything is running smoothly!</p>
+            <div class="btn-group">
+                <a href="/api/v1" class="button">Explore API v1</a>
+                <a href="/api/v1/info" class="button">Project Info</a>
+                <a href="https://github.com" target="_blank" class="button">Visit GitHub</a>
             </div>
-        </body>
-        </html>
-    `);
+            <div class="info">© ${new Date().getFullYear()} Express App | Version 1.0.0</div>
+        </div>
+    </body>
+    </html>
+  `);
 });
 
 app.use("/api/v1", routes);

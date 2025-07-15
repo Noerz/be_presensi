@@ -1,190 +1,57 @@
-// /src/controllers/jadwal.controller.js
+const jadwalService = require("../../services/jadwal/jadwalService");
+const { successResponse, errorResponse } = require("../../helper/response");
 
-const {
-  getAllJadwal,
-  createJadwal,
-  getJadwalById,
-  updateJadwal,
-  deleteJadwal,
-} = require("../../services/jadwal/jadwalService");
-
-const getAllJadwalController = async (req, res) => {
+const getAllJadwalController = async (req, res, next) => {
   try {
     const { page = 1, limit = 10 } = req.query;
-    const { count, rows } = await getAllJadwal(page, limit);
-
-    return res.status(200).json({
-      code: 200,
-      status: "success",
-      message: "Jadwal retrieved successfully",
-      data: rows,
-      meta: {
-        total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
-      },
+    const { count, rows } = await jadwalService.getAllJadwal(+page, +limit);
+    return successResponse(res, 200, "Jadwal retrieved successfully", rows, {
+      total: count,
+      page: +page,
+      limit: +limit,
+      totalPages: Math.ceil(count / limit),
     });
-  } catch (error) {
-    return res.status(500).json({
-      code: 500,
-      status: "error",
-      message: error.message,
-    });
+  } catch (err) {
+    next(err);
   }
 };
 
-const createJadwalController = async (req, res) => {
+const createJadwalController = async (req, res, next) => {
   try {
-    const {
-      hari,
-      tahun,
-      jam_mulai,
-      jam_selesai,
-      mapel_id,
-      guru_id,
-      kelas_id,
-    } = req.body;
-
-    if (
-      !hari ||
-      !tahun ||
-      !jam_mulai ||
-      !jam_selesai ||
-      !mapel_id ||
-      !guru_id ||
-      !kelas_id
-    ) {
-      return res.status(400).json({
-        code: 400,
-        status: "error",
-        message: "All fields are required",
-      });
-    }
-
-    const newJadwal = await createJadwal({
-      hari,
-      tahun,
-      jam_mulai,
-      jam_selesai,
-      mapel_id,
-      guru_id,
-      kelas_id,
-    });
-
-    return res.status(201).json({
-      code: 201,
-      status: "success",
-      message: "Jadwal created successfully",
-      data: newJadwal,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      code: 500,
-      status: "error",
-      message: error.message,
-    });
+    const newJadwal = await jadwalService.createJadwal(req.body);
+    return successResponse(res, 201, "Jadwal created successfully", newJadwal);
+  } catch (err) {
+    next(err);
   }
 };
 
-const getJadwalByIdController = async (req, res) => {
+const getJadwalByIdController = async (req, res, next) => {
   try {
-    const { idJadwal } = req.params;
-    const jadwal = await getJadwalById(idJadwal);
-
-    if (!jadwal) {
-      return res.status(404).json({
-        code: 404,
-        status: "error",
-        message: "Jadwal not found",
-      });
-    }
-
-    return res.status(200).json({
-      code: 200,
-      status: "success",
-      message: "Jadwal retrieved successfully",
-      data: jadwal,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      code: 500,
-      status: "error",
-      message: error.message,
-    });
+    const jadwal = await jadwalService.getJadwalById(req.params.idJadwal);
+    if (!jadwal) return errorResponse(res, 404, "Jadwal not found");
+    return successResponse(res, 200, "Jadwal retrieved successfully", jadwal);
+  } catch (err) {
+    next(err);
   }
 };
 
-const updateJadwalController = async (req, res) => {
+const updateJadwalController = async (req, res, next) => {
   try {
-    const { idJadwal } = req.params;
-    const {
-      hari,
-      tahun,
-      jam_mulai,
-      jam_selesai,
-      mapel_id,
-      guru_id,
-      kelas_id,
-    } = req.body;
-
-    const updated = await updateJadwal(idJadwal, {
-      hari,
-      tahun,
-      jam_mulai,
-      jam_selesai,
-      mapel_id,
-      guru_id,
-      kelas_id,
-    });
-
-    if (!updated) {
-      return res.status(404).json({
-        code: 404,
-        status: "error",
-        message: "Jadwal not found",
-      });
-    }
-
-    return res.status(200).json({
-      code: 200,
-      status: "success",
-      message: "Jadwal updated successfully",
-      data: updated,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      code: 500,
-      status: "error",
-      message: error.message,
-    });
+    const updated = await jadwalService.updateJadwal(req.params.idJadwal, req.body);
+    if (!updated) return errorResponse(res, 404, "Jadwal not found");
+    return successResponse(res, 200, "Jadwal updated successfully", updated);
+  } catch (err) {
+    next(err);
   }
 };
 
-const deleteJadwalController = async (req, res) => {
+const deleteJadwalController = async (req, res, next) => {
   try {
-    const { idJadwal } = req.params;
-    const deleted = await deleteJadwal(idJadwal);
-
-    if (!deleted) {
-      return res.status(404).json({
-        code: 404,
-        status: "error",
-        message: "Jadwal not found",
-      });
-    }
-
-    return res.status(200).json({
-      code: 200,
-      status: "success",
-      message: "Jadwal deleted successfully",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      code: 500,
-      status: "error",
-      message: error.message,
-    });
+    const deleted = await jadwalService.deleteJadwal(req.params.idJadwal);
+    if (!deleted) return errorResponse(res, 404, "Jadwal not found");
+    return successResponse(res, 200, "Jadwal deleted successfully");
+  } catch (err) {
+    next(err);
   }
 };
 

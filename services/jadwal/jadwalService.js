@@ -1,15 +1,18 @@
-// /src/services/jadwal.service.js
-
 const db = require("../../config/database");
 const initModels = require("../../models/init-models");
-const models = initModels(db);
 const { v4: uuidv4 } = require("uuid");
 
-const getAllJadwal = async (page, limit) => {
+const models = initModels(db);
+
+/**
+ * Get all jadwal with pagination
+ */
+const getAllJadwal = async (page = 1, limit = 10) => {
   const offset = (page - 1) * limit;
+
   return await models.jadwal.findAndCountAll({
-    offset: parseInt(offset),
-    limit: parseInt(limit),
+    offset,
+    limit,
     order: [["createdAt", "DESC"]],
     include: [
       { model: models.mata_pelajaran, as: "mapel" },
@@ -19,18 +22,18 @@ const getAllJadwal = async (page, limit) => {
   });
 };
 
-const createJadwal = async (payload) => {
-  // Pastikan field sesuai model
-  const {
-    hari,
-    tahun,
-    jam_mulai,
-    jam_selesai,
-    mapel_id,
-    guru_id,
-    kelas_id,
-  } = payload;
-
+/**
+ * Create new jadwal
+ */
+const createJadwal = async ({
+  hari,
+  tahun,
+  jam_mulai,
+  jam_selesai,
+  mapel_id,
+  guru_id,
+  kelas_id,
+}) => {
   return await models.jadwal.create({
     idJadwal: uuidv4(),
     hari,
@@ -40,11 +43,12 @@ const createJadwal = async (payload) => {
     mapel_id,
     guru_id,
     kelas_id,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   });
 };
 
+/**
+ * Get jadwal by primary key
+ */
 const getJadwalById = async (idJadwal) => {
   return await models.jadwal.findByPk(idJadwal, {
     include: [
@@ -55,27 +59,24 @@ const getJadwalById = async (idJadwal) => {
   });
 };
 
-const updateJadwal = async (idJadwal, payload) => {
+/**
+ * Update existing jadwal by ID
+ */
+const updateJadwal = async (idJadwal, updatePayload) => {
   const jadwal = await models.jadwal.findByPk(idJadwal);
   if (!jadwal) return null;
 
-  // Hanya update field yang ada di model
-  await jadwal.update({
-    hari: payload.hari,
-    tahun: payload.tahun,
-    jam_mulai: payload.jam_mulai,
-    jam_selesai: payload.jam_selesai,
-    mapel_id: payload.mapel_id,
-    guru_id: payload.guru_id,
-    kelas_id: payload.kelas_id,
-    updatedAt: new Date(),
-  });
-
+  await jadwal.update(updatePayload);
   return jadwal;
 };
 
+/**
+ * Delete jadwal by ID
+ */
 const deleteJadwal = async (idJadwal) => {
-  const deleted = await models.jadwal.destroy({ where: { idJadwal } });
+  const deleted = await models.jadwal.destroy({
+    where: { idJadwal },
+  });
   return deleted > 0;
 };
 

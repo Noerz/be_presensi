@@ -27,6 +27,7 @@ class AuthService {
         idAuth: uuidv4(),
         email,
         password: hashPassword,
+        nip,
         role_id: role.idRole,
         createdAt: new Date(),
         updatedAt: new Date(),

@@ -7,7 +7,7 @@ const MailService = require("./mailService");
 const UserService = require("./userService");
 
 class AuthService {
-  static async registerUser({ nama, email, password, roleCode }) {
+  static async registerUser({ nip,nama, email, password, roleCode }) {
     try {
       // Validasi Role
       const role = await models.role.findOne({ where: { code: roleCode } });

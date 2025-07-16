@@ -281,17 +281,39 @@ const getRekapPresensiByBulanDanUser = async (req, res) => {
   }
 };
 
-// GET: Export semua presensi ke Excel
+// GET: Export presensi ke Excel berdasarkan bulan dan/atau userId
 const exportRekapPresensiToExcel = async (req, res) => {
   try {
+    const { bulan, tahun, userId } = req.query;
+
+    const whereClause = {};
+    const includeClause = [
+      {
+        model: models.user,
+        as: "staff",
+        attributes: ["nama"],
+      },
+    ];
+
+    // Jika ada filter bulan dan tahun
+    if (bulan && tahun) {
+      const startDate = moment(`${tahun}-${bulan}-01`)
+        .startOf("month")
+        .toDate();
+      const endDate = moment(`${tahun}-${bulan}-01`).endOf("month").toDate();
+      whereClause.createdAt = {
+        [db.Sequelize.Op.between]: [startDate, endDate],
+      };
+    }
+
+    // Jika ada filter userId
+    if (userId) {
+      whereClause.staff_id = userId;
+    }
+
     const presensiData = await models.presensi.findAll({
-      include: [
-        {
-          model: models.user,
-          as: "staff",
-          attributes: ["nama"],
-        },
-      ],
+      where: whereClause,
+      include: includeClause,
       order: [["createdAt", "ASC"]],
     });
 
@@ -311,8 +333,8 @@ const exportRekapPresensiToExcel = async (req, res) => {
       worksheet.addRow({
         nama: item.staff?.nama || "-",
         tanggal: moment(item.createdAt).format("YYYY-MM-DD"),
-        inTime: item.inTime,
-        inKeterangan: item.inKeterangan,
+        inTime: item.inTime || "-",
+        inKeterangan: item.inKeterangan || "-",
         outTime: item.outTime || "-",
         outKeterangan: item.outKeterangan || "-",
       });
@@ -322,9 +344,31 @@ const exportRekapPresensiToExcel = async (req, res) => {
       "Content-Type",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
+    let fileName = "rekap_presensi";
+
+    // Jika hanya ada userId
+    if (userId && !bulan && !tahun) {
+      fileName += `_user_${userId}`;
+    }
+
+    // Jika hanya ada bulan dan tahun
+    else if (bulan && tahun && !userId) {
+      fileName += `_${bulan}_${tahun}`;
+    }
+
+    // Jika semua tersedia
+    else if (bulan && tahun && userId) {
+      fileName += `_${bulan}_${tahun}_user_${userId}`;
+    }
+
+    // Jika tidak ada filter, gunakan default "all"
+    else {
+      fileName += `_all`;
+    }
+
     res.setHeader(
       "Content-Disposition",
-      "attachment; filename=rekap_presensi.xlsx"
+      `attachment; filename=${fileName}.xlsx`
     );
 
     await workbook.xlsx.write(res);
@@ -338,6 +382,7 @@ const exportRekapPresensiToExcel = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   createPresensiStaff,
   updatePresensiOutStaff,

@@ -7,7 +7,8 @@ const MailService = require("./mailService");
 const UserService = require("./userService");
 
 class AuthService {
-  static async registerUser({ nip,nama, email, password, roleCode }) {
+  static async registerUser({ nip, nama, email, password, roleCode }) {
+    console.log("nip:", nip);
     try {
       // Validasi Role
       const role = await models.role.findOne({ where: { code: roleCode } });
@@ -18,6 +19,13 @@ class AuthService {
       if (existingAuth)
         return { status: 409, response: { msg: "Email already exists" } };
 
+      // Cek apakah NIP sudah digunakan
+      if (nip) {
+        const existingUser = await models.user.findOne({ where: { nip } });
+        if (existingUser)
+          return { status: 409, response: { msg: "NIP already exists" } };
+      }
+
       // Enkripsi password
       const salt = await bcrypt.genSalt(10);
       const hashPassword = await bcrypt.hash(password, salt);
@@ -27,7 +35,6 @@ class AuthService {
         idAuth: uuidv4(),
         email,
         password: hashPassword,
-        nip,
         role_id: role.idRole,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -38,6 +45,7 @@ class AuthService {
       if ([1, 2].includes(roleCode)) {
         newUser = await UserService.createStaff({
           nama,
+          nip,
           auth_id: newAuth.idAuth,
         });
       }

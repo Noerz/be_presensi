@@ -22,33 +22,13 @@ async function seedPresensiDummy(staff_id) {
     const daysInMonth = moment(`${tahun}-${bulan}`, "YYYY-MM").daysInMonth();
 
     for (let tanggal = 1; tanggal <= daysInMonth; tanggal++) {
-      const tanggalPresensi = moment(`${tahun}-${bulan}-${tanggal}`, "YYYY-MM-DD");
+      const tanggalPresensi = moment(
+        `${tahun}-${bulan}-${tanggal}`,
+        "YYYY-MM-DD"
+      );
 
       // Lewatkan akhir pekan (Sabtu: 6, Minggu: 0)
       if ([0, 6].includes(tanggalPresensi.day())) continue;
-
-      // Cek apakah hari ini izin (2% kemungkinan)
-      const izin = Math.random() < 0.02;
-      if (izin) {
-        // Buat record izin (bisa disesuaikan sesuai schema)
-        await models.presensi.create({
-          idPresensi: uuidv4(),
-          inLocation: null,
-          inTime: null,
-          inStatus: "Izin",
-          inKeterangan: "Izin tidak masuk",
-          outLocation: null,
-          outTime: null,
-          outStatus: "Izin",
-          outKeterangan: "Izin tidak keluar",
-          staff_id,
-          sekolah_id: sekolah.idSekolah,
-          createdAt: tanggalPresensi.toDate(),
-          updatedAt: tanggalPresensi.toDate(),
-        });
-        console.log(`Presensi izin untuk ${tanggalPresensi.format("YYYY-MM-DD")} berhasil ditambahkan`);
-        continue; // lanjut ke tanggal berikutnya
-      }
 
       // Jam masuk normal acak antara 6:30 sampai 7:15
       const masukBase = tanggalPresensi.clone().hour(6).minute(30);
@@ -56,11 +36,13 @@ async function seedPresensiDummy(staff_id) {
       let inMoment = masukBase.clone().add(masukVar, "minutes");
 
       // Tentukan status terlambat jika lebih dari jam masuk sekolah
-      const terlambat = inMoment.isAfter(tanggalPresensi.clone().set({
-        hour: inTimeSekolah.hour(),
-        minute: inTimeSekolah.minute(),
-        second: 0,
-      }));
+      const terlambat = inMoment.isAfter(
+        tanggalPresensi.clone().set({
+          hour: inTimeSekolah.hour(),
+          minute: inTimeSekolah.minute(),
+          second: 0,
+        })
+      );
 
       const inStatus = terlambat ? "Terlambat" : "Tepat Waktu";
       const diffInMinute = inMoment.diff(
@@ -81,18 +63,23 @@ async function seedPresensiDummy(staff_id) {
       let outMoment = pulangBase.clone().add(pulangVar, "minutes");
 
       // Tentukan status terlalu cepat jika pulang sebelum jam pulang sekolah
-      const terlaluCepat = outMoment.isBefore(tanggalPresensi.clone().set({
-        hour: outTimeSekolah.hour(),
-        minute: outTimeSekolah.minute(),
-        second: 0,
-      }));
+      const terlaluCepat = outMoment.isBefore(
+        tanggalPresensi.clone().set({
+          hour: outTimeSekolah.hour(),
+          minute: outTimeSekolah.minute(),
+          second: 0,
+        })
+      );
 
       const outStatus = terlaluCepat ? "Terlalu Cepat" : "Tepat Waktu";
-      const diffOutMinute = tanggalPresensi.clone().set({
-        hour: outTimeSekolah.hour(),
-        minute: outTimeSekolah.minute(),
-        second: 0,
-      }).diff(outMoment, "minutes");
+      const diffOutMinute = tanggalPresensi
+        .clone()
+        .set({
+          hour: outTimeSekolah.hour(),
+          minute: outTimeSekolah.minute(),
+          second: 0,
+        })
+        .diff(outMoment, "minutes");
       const outKeterangan = terlaluCepat
         ? `Pulang terlalu cepat ${diffOutMinute} menit`
         : "Tepat waktu";
@@ -113,7 +100,11 @@ async function seedPresensiDummy(staff_id) {
         updatedAt: tanggalPresensi.toDate(),
       });
 
-      console.log(`Presensi untuk ${tanggalPresensi.format("YYYY-MM-DD")} berhasil ditambahkan`);
+      console.log(
+        `Presensi untuk ${tanggalPresensi.format(
+          "YYYY-MM-DD"
+        )} berhasil ditambahkan`
+      );
     }
   }
 

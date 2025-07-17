@@ -99,11 +99,11 @@ async function seedPresensiDummy(staff_id) {
 
       await models.presensi.create({
         idPresensi: uuidv4(),
-        inLocation: sekolah.inLocation,
+        inLocation: sekolah.location,
         inTime: inMoment.format("YYYY-MM-DD HH:mm:ss"),
         inStatus,
         inKeterangan,
-        outLocation: sekolah.outLocation,
+        outLocation: sekolah.location,
         outTime: outMoment.format("YYYY-MM-DD HH:mm:ss"),
         outStatus,
         outKeterangan,

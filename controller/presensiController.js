@@ -404,7 +404,7 @@ const seedPresensiDummy = async (req, res) => {
     const outTimeSekolah = moment(sekolah.outTime, "HH:mm:ss");
 
     const bulanAwal = 3; // Maret
-    const bulanAkhir = 6; // Juni
+    const bulanAkhir = 5; // Juni
     const tahun = 2025;
 
     for (let bulan = bulanAwal; bulan <= bulanAkhir; bulan++) {

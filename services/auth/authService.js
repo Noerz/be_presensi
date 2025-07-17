@@ -137,6 +137,18 @@ class AuthService {
     }
   }
 
+  static async getAllUsers() {
+    try {
+      const users = await models.user.findAll({
+        attributes: ["idUser", "nama", "nip"],
+        order: [["nama", "ASC"]],
+      });
+      return users;
+    } catch (error) {
+      throw new Error("Failed to retrieve user list: " + error.message);
+    }
+  }
+
   static async resetPassword(email) {
     try {
       if (!email)

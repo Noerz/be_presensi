@@ -1,7 +1,7 @@
 const AuthService = require("../../services/auth/authService");
 
 const Register = async (req, res) => {
-  const { nama, email, password, nip,roleCode } = req.body;
+  const { nama, email, password, nip, roleCode } = req.body;
 
   try {
     const result = await AuthService.registerUser({
@@ -53,4 +53,23 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { Register, login, resetPassword };
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await AuthService.getAllUsers();
+    res.status(200).json({
+      code: 200,
+      status: "success",
+      message: "User list retrieved",
+      data: users,
+    });
+  } catch (error) {
+    console.error("Get All Users Error:", error);
+    res.status(500).json({
+      code: 500,
+      status: "error",
+      message: error.message || "Failed to fetch users",
+    });
+  }
+};
+
+module.exports = { Register, login, resetPassword, getAllUsers };

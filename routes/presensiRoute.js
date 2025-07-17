@@ -8,6 +8,7 @@ const {
   updatePresensiOutStaff,
   getRekapPresensiByBulanDanUser,
   exportRekapPresensiToExcel,
+  seedPresensiDummy,
 } = require("../controller/presensiController");
 
 const presensiRoutes = (router) => {
@@ -16,6 +17,7 @@ const presensiRoutes = (router) => {
   router.get("/export-rekap", verifyToken, exportRekapPresensiToExcel);
   router.post("/presensi/staff", verifyToken, createPresensiStaff); // Create presensi masuk for staff
   router.put("/presensi/staff", verifyToken, updatePresensiOutStaff); // Update presensi keluar for staff
+  router.post("/presensi/seed-dummy", seedPresensiDummy);
 };
 
 module.exports = { presensiRoutes };

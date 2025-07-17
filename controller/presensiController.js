@@ -381,6 +381,127 @@ const exportRekapPresensiToExcel = async (req, res) => {
       message: error.message,
     });
   }
+
+  const seedPresensiDummy = async (req, res) => {
+    try {
+      const { staff_id } = req.body;
+
+      if (!staff_id) {
+        return res.status(400).json({
+          code: 400,
+          status: "error",
+          message: "staff_id is required in body",
+        });
+      }
+
+      const sekolah = await models.sekolah.findOne();
+      if (!sekolah) {
+        return res.status(404).json({ message: "Sekolah tidak ditemukan." });
+      }
+
+      const inTimeSekolah = moment(sekolah.inTime, "HH:mm:ss");
+      const outTimeSekolah = moment(sekolah.outTime, "HH:mm:ss");
+
+      const bulanAwal = 3; // Maret
+      const bulanAkhir = 6; // Juni
+      const tahun = 2025;
+
+      for (let bulan = bulanAwal; bulan <= bulanAkhir; bulan++) {
+        const daysInMonth = moment(
+          `${tahun}-${bulan}`,
+          "YYYY-MM"
+        ).daysInMonth();
+
+        for (let tanggal = 1; tanggal <= daysInMonth; tanggal++) {
+          const tanggalPresensi = moment(
+            `${tahun}-${bulan}-${tanggal}`,
+            "YYYY-MM-DD"
+          );
+
+          if ([0, 6].includes(tanggalPresensi.day())) continue; // Skip weekend
+
+          const masukBase = tanggalPresensi.clone().hour(6).minute(30);
+          const masukVar = Math.floor(Math.random() * 46);
+          const inMoment = masukBase.clone().add(masukVar, "minutes");
+
+          const terlambat = inMoment.isAfter(
+            tanggalPresensi.clone().set({
+              hour: inTimeSekolah.hour(),
+              minute: inTimeSekolah.minute(),
+              second: 0,
+            })
+          );
+
+          const inStatus = terlambat ? "Terlambat" : "Tepat Waktu";
+          const diffInMinute = inMoment.diff(
+            tanggalPresensi.clone().set({
+              hour: inTimeSekolah.hour(),
+              minute: inTimeSekolah.minute(),
+              second: 0,
+            }),
+            "minutes"
+          );
+          const inKeterangan = terlambat
+            ? `Terlambat ${diffInMinute} menit`
+            : "Tepat waktu";
+
+          const pulangBase = tanggalPresensi.clone().hour(13).minute(15);
+          const pulangVar = Math.floor(Math.random() * 46);
+          const outMoment = pulangBase.clone().add(pulangVar, "minutes");
+
+          const terlaluCepat = outMoment.isBefore(
+            tanggalPresensi.clone().set({
+              hour: outTimeSekolah.hour(),
+              minute: outTimeSekolah.minute(),
+              second: 0,
+            })
+          );
+
+          const outStatus = terlaluCepat ? "Terlalu Cepat" : "Tepat Waktu";
+          const diffOutMinute = tanggalPresensi
+            .clone()
+            .set({
+              hour: outTimeSekolah.hour(),
+              minute: outTimeSekolah.minute(),
+              second: 0,
+            })
+            .diff(outMoment, "minutes");
+          const outKeterangan = terlaluCepat
+            ? `Pulang terlalu cepat ${diffOutMinute} menit`
+            : "Tepat waktu";
+
+          await models.presensi.create({
+            idPresensi: uuidv4(),
+            inLocation: sekolah.location,
+            inTime: inMoment.format("YYYY-MM-DD HH:mm:ss"),
+            inStatus,
+            inKeterangan,
+            outLocation: sekolah.location,
+            outTime: outMoment.format("YYYY-MM-DD HH:mm:ss"),
+            outStatus,
+            outKeterangan,
+            staff_id,
+            sekolah_id: sekolah.idSekolah,
+            createdAt: tanggalPresensi.toDate(),
+            updatedAt: tanggalPresensi.toDate(),
+          });
+        }
+      }
+
+      return res.status(200).json({
+        code: 200,
+        status: "success",
+        message: `Seeder selesai dijalankan untuk staff_id: ${staff_id}`,
+      });
+    } catch (error) {
+      console.error("Seeder error:", error.message);
+      return res.status(500).json({
+        code: 500,
+        status: "error",
+        message: error.message,
+      });
+    }
+  };
 };
 
 module.exports = {
@@ -389,4 +510,5 @@ module.exports = {
   getPresensiByUser,
   getRekapPresensiByBulanDanUser,
   exportRekapPresensiToExcel,
+  seedPresensiDummy,
 };
